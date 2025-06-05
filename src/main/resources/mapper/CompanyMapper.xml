@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.internship.exporter.mapper.CompanyMapper">
+
+    <select id="insertCompany" resultMap="companyResultMap">
+        INSERT INTO company (
+            company_name,
+            company_number,
+            company_status,
+            company_location,
+            date_of_creation
+        )
+        VALUES (
+            #{companyName},
+            #{companyNumber},
+            #{companyStatus},
+            #{companyLocation},
+            #{dateOfCreation}
+        )
+        ON CONFLICT (company_number)
+        DO UPDATE
+        SET
+            company_name = EXCLUDED.company_name,
+            company_status = EXCLUDED.company_status,
+            company_location = EXCLUDED.company_location,
+            date_of_creation = EXCLUDED.date_of_creation
+        RETURNING *;
+    </select>
+
+    <select id="insertIndustries" resultMap="industryResultMap">
+        INSERT INTO industry (
+        industry_code,
+        industry_name,
+        industry_description
+        )
+        VALUES
+        <foreach collection="list" item="industry" separator=",">
+            (
+            #{industry.industryCode},
+            #{industry.industryName},
+            #{industry.industryDescription}
+            )
+        </foreach>
+        ON CONFLICT (industry_code)
+        DO UPDATE
+        SET
+            industry_name = EXCLUDED.industry_name,
+            industry_description = EXCLUDED.industry_description
+        RETURNING *;
+    </select>
+
+    <insert id="insertCompanyIndustry">
+        INSERT INTO company_industry(company_id, industry_id)
+        VALUES
+        <foreach collection="industries" item="industry" separator=",">
+            (
+            #{company.id},
+            #{industry.id}
+            )
+        </foreach>
+        ON CONFLICT
+        DO NOTHING;
+    </insert>
+
+    <resultMap id="companyResultMap" type="com.internship.exporter.model.Company">
+        <id property="id" column="id"/>
+        <result property="companyName" column="company_name"/>
+        <result property="companyNumber" column="company_number"/>
+        <result property="companyStatus" column="company_status"/>
+        <result property="companyLocation" column="company_location"/>
+        <result property="dateOfCreation" column="date_of_creation"/>
+    </resultMap>
+
+    <resultMap id="industryResultMap" type="com.internship.exporter.model.Industry">
+        <id property="id" column="id"/>
+        <result property="industryCode" column="industry_code"/>
+        <result property="industryName" column="industry_name"/>
+        <result property="industryDescription" column="industry_description"/>
+    </resultMap>
+
+</mapper>

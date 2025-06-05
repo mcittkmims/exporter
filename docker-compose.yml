@@ -1,0 +1,17 @@
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: company_export
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: company_export
+    ports:
+      - "54321:5432"
+    volumes:
+      - company_export:/var/lib/postgresql/data
+
+volumes:
+  company_export:

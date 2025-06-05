@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: exporter
+  - include:
+      file: migration/V1__migrate_table_industry.sql
+      relativeToChangelogFile: true
+
+  - changeSet:
+      id: 2
+      author: exporter
+  - include:
+      file: migration/V2__migrate_table_company.sql
+      relativeToChangelogFile: true
+
+  - changeSet:
+      id: 3
+      author: exporter
+  - include:
+      file: migration/V3__migrate_table_company_industry.sql
+      relativeToChangelogFile: true
+
+
