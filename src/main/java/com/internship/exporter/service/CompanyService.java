@@ -53,35 +53,47 @@ public class CompanyService {
         return Flux.defer(() -> {
             StringBuilder partialLine = new StringBuilder();
             return dataBufferFlux
-                    .map(dataBuffer -> {
-                        String chunk = dataBuffer.toString(StandardCharsets.UTF_8);
-                        DataBufferUtils.release(dataBuffer);
-                        return chunk;
-                    })
-                    .concatMap(chunk -> {
-                        List<String> lines = new ArrayList<>();
-                        String[] split = chunk.split("\n", -1);
-                        for (int i = 0; i < split.length; i++) {
-                            if (i == 0) {
-                                partialLine.append(split[i]);
-                            } else {
-                                lines.add(partialLine.toString());
-                                partialLine.setLength(0);
-                                partialLine.append(split[i]);
-                            }
-                        }
-                        return Flux.fromIterable(lines);
-                    })
-                    .concatWith(Flux.defer(() -> {
-                        if (!partialLine.isEmpty()) {
-                            return Flux.just(partialLine.toString());
-                        } else {
-                            return Flux.empty();
-                        }
-                    }));
+                    .map(this::convertDataBufferToString)
+                    .concatMap(chunk -> processChunk(chunk, partialLine))
+                    .concatWith(getRemainingLine(partialLine));
         });
     }
 
+    private String convertDataBufferToString(DataBuffer dataBuffer) {
+        String chunk = dataBuffer.toString(StandardCharsets.UTF_8);
+        DataBufferUtils.release(dataBuffer);
+        return chunk;
+    }
+
+    private Flux<String> processChunk(String chunk, StringBuilder partialLine) {
+        List<String> lines = new ArrayList<>();
+        String[] split = chunk.split("\n", -1);
+
+        for (int i = 0; i < split.length; i++) {
+            if (i == 0) {
+                partialLine.append(split[i]);
+            } else {
+                lines.add(partialLine.toString());
+                resetPartialLine(partialLine, split[i]);
+            }
+        }
+        return Flux.fromIterable(lines);
+    }
+
+    private void resetPartialLine(StringBuilder partialLine, String newContent) {
+        partialLine.setLength(0);
+        partialLine.append(newContent);
+    }
+
+    private Flux<String> getRemainingLine(StringBuilder partialLine) {
+        return Flux.defer(() -> {
+            if (!partialLine.isEmpty()) {
+                return Flux.just(partialLine.toString());
+            } else {
+                return Flux.empty();
+            }
+        });
+    }
 
     private Company processJson(String s, CompanyMapping companyMapping, IndustryMapping industryMapping) {
         Company company = converter.mapJsonToCompany(s, companyMapping, industryMapping);
@@ -90,6 +102,4 @@ public class CompanyService {
         }
         return company;
     }
-
-
 }

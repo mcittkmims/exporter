@@ -22,12 +22,12 @@ public class CompanyController {
 
 
     @PostMapping("/upload")
-    public Flux<Company> getRawCompanyData
+    public void transformRawCompanyData
             (@RequestPart("companyMapping") CompanyMapping companyMapping,
              @RequestPart("industryMapping") IndustryMapping industryMapping,
              @RequestPart("data") Mono<FilePart> fileStream) throws IOException {
 
-        return this.service.processJsons(fileStream, companyMapping, industryMapping);
+        this.service.processJsons(fileStream, companyMapping, industryMapping);
 
     }
 }
