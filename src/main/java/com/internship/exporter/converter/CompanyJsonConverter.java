@@ -54,24 +54,33 @@ public class CompanyJsonConverter {
 
     private static List<Industry> extractIndustriesIfPresent(Object json, String industriesPath, IndustryMapping industryMapping) {
         List<Industry> industries = new ArrayList<>();
-        
+
         if (industriesPath == null || industriesPath.isEmpty()) {
             return industries;
         }
 
         try {
-            List<Object> industriesArray = JsonPath.read(json, industriesPath);
-            
-            for (Object industryObj : industriesArray) {
+            Object industriesObj = JsonPath.read(json, industriesPath);
+
+            if (industriesObj instanceof List<?>) {
+                for (Object industryObj : (List<?>) industriesObj) {
+                    Industry industry = new Industry();
+                    industry.setIndustryCode(extractStringFromObject(industryObj, industryMapping.getIndustryCode()));
+                    industry.setIndustryName(extractStringFromObject(industryObj, industryMapping.getIndustryName()));
+                    industry.setIndustryDescription(extractStringFromObject(industryObj, industryMapping.getIndustryDescription()));
+                    industries.add(industry);
+                }
+            } else if (industriesObj != null) {
+                // Single object case
                 Industry industry = new Industry();
-                industry.setIndustryCode(extractStringFromObject(industryObj, industryMapping.getIndustryCode()));
-                industry.setIndustryName(extractStringFromObject(industryObj, industryMapping.getIndustryName()));
-                industry.setIndustryDescription(extractStringFromObject(industryObj, industryMapping.getIndustryDescription()));
+                industry.setIndustryCode(extractStringFromObject(industriesObj, industryMapping.getIndustryCode()));
+                industry.setIndustryName(extractStringFromObject(industriesObj, industryMapping.getIndustryName()));
+                industry.setIndustryDescription(extractStringFromObject(industriesObj, industryMapping.getIndustryDescription()));
                 industries.add(industry);
             }
         } catch (Exception ignored) {
         }
-        
+
         return industries;
     }
     
