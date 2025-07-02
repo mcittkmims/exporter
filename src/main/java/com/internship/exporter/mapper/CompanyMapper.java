@@ -1,7 +1,6 @@
 package com.internship.exporter.mapper;
 
-import com.internship.exporter.model.Company;
-import com.internship.exporter.model.Industry;
+import com.internship.exporter.model.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -15,4 +14,10 @@ public interface CompanyMapper {
     List<Industry> insertIndustries(@Param("list") List<Industry> industries);
 
     void insertCompanyIndustry(@Param("company") Company company, @Param("industries")List<Industry> industries);
+
+    TerminationInfo insertTerminationInfo(@Param("terminationInfo") TerminationInfo terminationInfo);
+
+    TaxAuthority insertTaxAuthority(TaxAuthority taxAuthority);
+
+    void insertTaxInfo(TaxInfo taxInfo);
 }

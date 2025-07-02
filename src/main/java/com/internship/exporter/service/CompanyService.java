@@ -1,9 +1,7 @@
 package com.internship.exporter.service;
 
 import com.internship.exporter.converter.CompanyJsonConverter;
-import com.internship.exporter.model.Company;
-import com.internship.exporter.model.CompanyMapping;
-import com.internship.exporter.model.IndustryMapping;
+import com.internship.exporter.model.*;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -23,29 +21,14 @@ public class CompanyService {
     private CompanyJsonConverter converter;
     private CompanyDataService dataService;
 
-//    public Flux<Company> processJsons(Mono<FilePart> filePartMono, CompanyMapping companyMapping, IndustryMapping industryMapping) {
-//        try (JsonParser jsonParser = new JsonFactory().createParser(inputStream)) {
-//            while (jsonParser.nextToken() != null) {
-//                if (jsonParser.currentToken() == JsonToken.START_OBJECT) {
-//                    System.out.println(jsonParser.readValueAsTree().toString());
-//                    Company company = converter.mapJsonToCompany(jsonParser.readValueAsTree().toString(), companyMapping, industryMapping);
-//                    System.out.println(company);
-//                    if (company.getCompanyNumber() != null) {
-//                        dataService.insertCompanyData(company);
-//                    }
-//                }
-//            }
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-
-//    }
-
-    public Flux<Company> processJsons(Mono<FilePart> filePartMono, CompanyMapping companyMapping, IndustryMapping industryMapping) {
+    public Flux<Company> processJsons(Mono<FilePart> filePartMono, CompanyMapping companyMapping,
+                                      IndustryMapping industryMapping,
+                                      TaxAuthorityMapping taxAuthorityMapping, TaxInfoMapping taxInfoMapping) {
         return filePartMono.flatMapMany(filePart ->
                 splitLines(filePart.content())
                         .filter(line -> !line.isEmpty())
-                        .map(line -> processJson(line, companyMapping, industryMapping))
+                        .map(line -> processJson(line, companyMapping, industryMapping,
+                                taxAuthorityMapping, taxInfoMapping))
         );
     }
 
@@ -95,8 +78,9 @@ public class CompanyService {
         });
     }
 
-    private Company processJson(String s, CompanyMapping companyMapping, IndustryMapping industryMapping) {
-        Company company = converter.mapJsonToCompany(s, companyMapping, industryMapping);
+    private Company processJson(String s, CompanyMapping companyMapping, IndustryMapping industryMapping,
+                                TaxAuthorityMapping taxAuthorityMapping, TaxInfoMapping taxInfoMapping) {
+        Company company = converter.mapJsonToCompany(s, companyMapping, industryMapping, taxAuthorityMapping, taxInfoMapping);
         if (company.getCompanyNumber() != null) {
             dataService.insertCompanyData(company);
         }

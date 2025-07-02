@@ -1,14 +1,13 @@
 package com.internship.exporter.controller;
 
-import com.internship.exporter.model.Company;
-import com.internship.exporter.model.CompanyMapping;
-import com.internship.exporter.model.IndustryMapping;
+import com.internship.exporter.model.*;
 import com.internship.exporter.service.CompanyService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -21,12 +20,13 @@ public class CompanyController {
 
 
     @PostMapping("/upload")
-    public void transformRawCompanyData
+    public Flux<Company> transformRawCompanyData
             (@RequestPart("companyMapping") CompanyMapping companyMapping,
              @RequestPart("industryMapping") IndustryMapping industryMapping,
+             @RequestPart("taxAuthorityMapping") TaxAuthorityMapping taxAuthorityMapping,
+             @RequestPart("taxInfoMapping") TaxInfoMapping taxInfoMapping,
              @RequestPart("data") Mono<FilePart> fileStream) throws IOException {
-
-        this.service.processJsons(fileStream, companyMapping, industryMapping);
-
+        return this.service.processJsons(fileStream, companyMapping, industryMapping,
+                taxAuthorityMapping, taxInfoMapping);
     }
 }

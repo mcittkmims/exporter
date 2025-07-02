@@ -1,8 +1,7 @@
 package com.internship.exporter.service;
 
 import com.internship.exporter.mapper.CompanyMapper;
-import com.internship.exporter.model.Company;
-import com.internship.exporter.model.Industry;
+import com.internship.exporter.model.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,10 +17,21 @@ public class CompanyDataService {
     @Transactional
     protected void insertCompanyData(Company company) {
         List<Industry> industries = company.getIndustries();
-        company = mapper.insertCompany(company);
-        if (!industries.isEmpty() && company.getCompanyNumber() != null) {
+        Company newCompany = mapper.insertCompany(company);
+        if (!industries.isEmpty() && newCompany.getCompanyNumber() != null) {
             industries = mapper.insertIndustries(industries);
-            mapper.insertCompanyIndustry(company, industries);
+            mapper.insertCompanyIndustry(newCompany, industries);
+        }
+
+        TaxAuthority taxAuthority = company.getTaxAuthority();
+        if (taxAuthority.getAuthorityName() != null) {
+            taxAuthority = mapper.insertTaxAuthority(taxAuthority);
+            TaxInfo taxInfo = company.getTaxInfo();
+            if (taxInfo.getTaxRegistrationNumber() != null) {
+                taxInfo.setTaxAuthorityId(taxAuthority.getId());
+                taxInfo.setCompanyId(newCompany.getId());
+                mapper.insertTaxInfo(taxInfo);
+            }
         }
     }
 }
