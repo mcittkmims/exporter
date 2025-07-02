@@ -2,8 +2,6 @@ package com.internship.exporter.model;
 
 import lombok.Data;
 
-import java.time.LocalDate;
-
 @Data
 public class CompanyMapping {
     private String companyName;
@@ -12,4 +10,8 @@ public class CompanyMapping {
     private String companyLocation;
     private String dateOfCreation;
     private String industries;
+    private String companyAuthority;
+    private String terminationDate;
+    private String taxInfo;
+    private String taxAuthority;
 }

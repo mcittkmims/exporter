@@ -10,14 +10,18 @@
             company_number,
             company_status,
             company_location,
-            date_of_creation
+            date_of_creation,
+            company_authority,
+            termination_date
         )
         VALUES (
             #{companyName},
             #{companyNumber},
             #{companyStatus},
             #{companyLocation},
-            #{dateOfCreation}
+            #{dateOfCreation},
+            #{companyAuthority},
+            #{terminationDate}
         )
         ON CONFLICT (company_number)
         DO UPDATE
@@ -25,7 +29,9 @@
             company_name = EXCLUDED.company_name,
             company_status = EXCLUDED.company_status,
             company_location = EXCLUDED.company_location,
-            date_of_creation = EXCLUDED.date_of_creation
+            date_of_creation = EXCLUDED.date_of_creation,
+            company_authority = EXCLUDED.company_authority,
+            termination_date = EXCLUDED.termination_date
         RETURNING *;
     </select>
 
@@ -64,6 +70,41 @@
         DO NOTHING;
     </insert>
 
+    <select id="insertTaxAuthority" resultMap="taxAuthorityResultMap">
+        INSERT INTO tax_authority (
+            authority_code,
+            authority_name
+        ) VALUES
+        (
+            #{authorityCode},
+            #{authorityName}
+        ) ON CONFLICT (authority_code, authority_name)
+            DO UPDATE
+          SET
+              authority_code = EXCLUDED.authority_code,
+              authority_name = EXCLUDED.authority_name
+          RETURNING *;
+    </select>
+
+    <insert id="insertTerminationInfo">
+        INSERT INTO termination (termination_date, termination_registration_number, termination_description, company_id)
+        VALUES (#{terminationDate},
+                #{terminationRegistrationNumber},
+                #{terminationDescription},
+                #{companyId})
+        ON CONFLICT DO NOTHING
+    </insert>
+
+    <insert id="insertTaxInfo">
+        INSERT INTO tax_info (tax_registration_number, date_of_registration, tax_payer_type, tax_authority_id, company_id)
+        VALUES (#{taxRegistrationNumber},
+                #{dateOfRegistration},
+                #{taxPayerType},
+                #{taxAuthorityId},
+                #{companyId})
+        ON CONFLICT DO NOTHING
+    </insert>
+
     <resultMap id="companyResultMap" type="com.internship.exporter.model.Company">
         <id property="id" column="id"/>
         <result property="companyName" column="company_name"/>
@@ -71,6 +112,7 @@
         <result property="companyStatus" column="company_status"/>
         <result property="companyLocation" column="company_location"/>
         <result property="dateOfCreation" column="date_of_creation"/>
+        <result property="companyAuthority" column="company_authority"/>
     </resultMap>
 
     <resultMap id="industryResultMap" type="com.internship.exporter.model.Industry">
@@ -78,6 +120,12 @@
         <result property="industryCode" column="industry_code"/>
         <result property="industryName" column="industry_name"/>
         <result property="industryDescription" column="industry_description"/>
+    </resultMap>
+
+    <resultMap id="taxAuthorityResultMap" type="com.internship.exporter.model.TaxAuthority">
+        <id property="id" column="id"/>
+        <result property="authorityCode" column="authority_code"/>
+        <result property="authorityName" column="authority_name"/>
     </resultMap>
 
 </mapper>
