@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -18,9 +19,14 @@ public class CompanyDataService {
     protected void insertCompanyData(Company company) {
         List<Industry> industries = company.getIndustries();
         Company newCompany = mapper.insertCompany(company);
-        if (!industries.isEmpty() && newCompany.getCompanyNumber() != null) {
-            industries = mapper.insertIndustries(industries);
-            mapper.insertCompanyIndustry(newCompany, industries);
+
+        List<Industry> filteredIndustries = industries.stream()
+                .filter(industry -> industry.getIndustryCode() != null)
+                .collect(Collectors.toList());
+
+        if (!filteredIndustries.isEmpty() && newCompany.getCompanyNumber() != null) {
+            filteredIndustries = mapper.insertIndustries(filteredIndustries);
+            mapper.insertCompanyIndustry(newCompany, filteredIndustries);
         }
 
         TaxAuthority taxAuthority = company.getTaxAuthority();
