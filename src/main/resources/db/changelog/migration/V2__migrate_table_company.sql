@@ -6,5 +6,7 @@ CREATE TABLE IF NOT EXISTS company (
     company_location TEXT,
     date_of_creation DATE,
     company_authority TEXT,
-    termination_date DATE
+    termination_date DATE,
+    inserted_at TIMESTAMP,
+    updated_at TIMESTAMP
 );

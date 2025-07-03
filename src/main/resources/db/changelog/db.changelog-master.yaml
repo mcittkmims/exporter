@@ -28,7 +28,7 @@ databaseChangeLog:
       author: exporter
       changes:
         - sqlFile:
-            path: migration/V4__migrate_table_termination.sql
+            path: migration/V4__migrate_table_tax_authority.sql
             relativeToChangelogFile: true
 
   - changeSet:
@@ -36,13 +36,5 @@ databaseChangeLog:
       author: exporter
       changes:
         - sqlFile:
-            path: migration/V5__migrate_table_tax_authority.sql
-            relativeToChangelogFile: true
-
-  - changeSet:
-      id: 6
-      author: exporter
-      changes:
-        - sqlFile:
-            path: migration/V6__migrate_table_tax_info.sql
+            path: migration/V5__migrate_table_tax_info.sql
             relativeToChangelogFile: true
