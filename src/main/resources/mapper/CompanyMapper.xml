@@ -12,7 +12,9 @@
             company_location,
             date_of_creation,
             company_authority,
-            termination_date
+            termination_date,
+            inserted_at,
+            updated_at
         )
         VALUES (
             #{companyName},
@@ -21,7 +23,9 @@
             #{companyLocation},
             #{dateOfCreation},
             #{companyAuthority},
-            #{terminationDate}
+            #{terminationDate},
+            now(),
+            now()
         )
         ON CONFLICT (company_number)
         DO UPDATE
@@ -31,7 +35,9 @@
             company_location = EXCLUDED.company_location,
             date_of_creation = EXCLUDED.date_of_creation,
             company_authority = EXCLUDED.company_authority,
-            termination_date = EXCLUDED.termination_date
+            termination_date = EXCLUDED.termination_date,
+            inserted_at = EXCLUDED.inserted_at,
+            updated_at = now()
         RETURNING *;
     </select>
 
@@ -39,31 +45,39 @@
         INSERT INTO industry (
         industry_code,
         industry_name,
-        industry_description
+        industry_description,
+        inserted_at,
+        updated_at
         )
         VALUES
         <foreach collection="list" item="industry" separator=",">
             (
             #{industry.industryCode},
             #{industry.industryName},
-            #{industry.industryDescription}
+            #{industry.industryDescription},
+             now(),
+             now()
             )
         </foreach>
         ON CONFLICT (industry_code)
         DO UPDATE
         SET
             industry_name = EXCLUDED.industry_name,
-            industry_description = EXCLUDED.industry_description
+            industry_description = EXCLUDED.industry_description,
+            inserted_at = EXCLUDED.inserted_at,
+            updated_at = now()
         RETURNING *;
     </select>
 
     <insert id="insertCompanyIndustry">
-        INSERT INTO company_industry(company_id, industry_id)
+        INSERT INTO company_industry(company_id, industry_id, inserted_at, updated_at)
         VALUES
         <foreach collection="industries" item="industry" separator=",">
             (
             #{company.id},
-            #{industry.id}
+            #{industry.id},
+             now(),
+             now()
             )
         </foreach>
         ON CONFLICT
@@ -73,35 +87,36 @@
     <select id="insertTaxAuthority" resultMap="taxAuthorityResultMap">
         INSERT INTO tax_authority (
             authority_code,
-            authority_name
+            authority_name,
+            inserted_at,
+            updated_at
         ) VALUES
         (
             #{authorityCode},
-            #{authorityName}
+            #{authorityName},
+         now(),
+         now()
         ) ON CONFLICT (authority_code, authority_name)
             DO UPDATE
           SET
               authority_code = EXCLUDED.authority_code,
-              authority_name = EXCLUDED.authority_name
+              authority_name = EXCLUDED.authority_name,
+              inserted_at = EXCLUDED.inserted_at,
+              updated_at = now()
           RETURNING *;
     </select>
 
-    <insert id="insertTerminationInfo">
-        INSERT INTO termination (termination_date, termination_registration_number, termination_description, company_id)
-        VALUES (#{terminationDate},
-                #{terminationRegistrationNumber},
-                #{terminationDescription},
-                #{companyId})
-        ON CONFLICT DO NOTHING
-    </insert>
-
     <insert id="insertTaxInfo">
-        INSERT INTO tax_info (tax_registration_number, date_of_registration, tax_payer_type, tax_authority_id, company_id)
+        INSERT INTO tax_info (tax_registration_number, date_of_registration, tax_payer_type, tax_authority_id, company_id
+        ,inserted_at, updated_at)
         VALUES (#{taxRegistrationNumber},
                 #{dateOfRegistration},
                 #{taxPayerType},
                 #{taxAuthorityId},
-                #{companyId})
+                #{companyId},
+                now(),
+                now()
+               )
         ON CONFLICT DO NOTHING
     </insert>
 
