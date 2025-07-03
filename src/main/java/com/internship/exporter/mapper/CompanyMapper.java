@@ -15,8 +15,6 @@ public interface CompanyMapper {
 
     void insertCompanyIndustry(@Param("company") Company company, @Param("industries")List<Industry> industries);
 
-    TerminationInfo insertTerminationInfo(@Param("terminationInfo") TerminationInfo terminationInfo);
-
     TaxAuthority insertTaxAuthority(TaxAuthority taxAuthority);
 
     void insertTaxInfo(TaxInfo taxInfo);
