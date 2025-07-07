@@ -2,22 +2,64 @@ databaseChangeLog:
   - changeSet:
       id: 1
       author: exporter
-  - include:
-      file: migration/V1__migrate_table_industry.sql
-      relativeToChangelogFile: true
+      changes:
+        - sqlFile:
+            path: migration/V6__migrate_table_country.sql
+            relativeToChangelogFile: true
 
   - changeSet:
       id: 2
       author: exporter
-  - include:
-      file: migration/V2__migrate_table_company.sql
-      relativeToChangelogFile: true
+      changes:
+        - sqlFile:
+            path: migration/V7__migrate_table_company_location.sql
+            relativeToChangelogFile: true
 
   - changeSet:
       id: 3
       author: exporter
-  - include:
-      file: migration/V3__migrate_table_company_industry.sql
-      relativeToChangelogFile: true
+      changes:
+        - sqlFile:
+            path: migration/V8__migrate_table_company_status.sql
+            relativeToChangelogFile: true
 
+  - changeSet:
+      id: 4
+      author: exporter
+      changes:
+        - sqlFile:
+            path: migration/V1__migrate_table_industry.sql
+            relativeToChangelogFile: true
+
+  - changeSet:
+      id: 5
+      author: exporter
+      changes:
+        - sqlFile:
+            path: migration/V2__migrate_table_company.sql
+            relativeToChangelogFile: true
+
+  - changeSet:
+      id: 6
+      author: exporter
+      changes:
+        - sqlFile:
+            path: migration/V3__migrate_table_company_industry.sql
+            relativeToChangelogFile: true
+
+  - changeSet:
+      id: 7
+      author: exporter
+      changes:
+        - sqlFile:
+            path: migration/V4__migrate_table_tax_authority.sql
+            relativeToChangelogFile: true
+
+  - changeSet:
+      id: 8
+      author: exporter
+      changes:
+        - sqlFile:
+            path: migration/V5__migrate_table_tax_company.sql
+            relativeToChangelogFile: true
 

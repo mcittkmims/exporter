@@ -12,9 +12,15 @@ public class Company {
     private Long id;
     private String companyName;
     private String companyNumber;
-    private String companyStatus;
-    private String companyLocation;
     private LocalDate dateOfCreation;
+    private String companyAuthority;
+    private LocalDate terminationDate;
+
 
     List<Industry> industries;
+    private TaxCompany taxCompany;
+    private TaxAuthority taxAuthority;
+    private CompanyLocation companyLocation;
+    private CompanyStatus companyStatus;
+    private Country country;
 }

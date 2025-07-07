@@ -8,24 +8,39 @@
         INSERT INTO company (
             company_name,
             company_number,
-            company_status,
-            company_location,
-            date_of_creation
+            status_id,
+            location_id,
+            date_of_creation,
+            company_authority,
+            termination_date,
+            country_id,
+            inserted_at,
+            updated_at
         )
         VALUES (
             #{companyName},
             #{companyNumber},
-            #{companyStatus},
-            #{companyLocation},
-            #{dateOfCreation}
+            #{companyStatus.id},
+            #{companyLocation.id},
+            #{dateOfCreation},
+            #{companyAuthority},
+            #{terminationDate},
+            #{country.id},
+            now(),
+            now()
         )
         ON CONFLICT (company_number)
         DO UPDATE
         SET
             company_name = EXCLUDED.company_name,
-            company_status = EXCLUDED.company_status,
-            company_location = EXCLUDED.company_location,
-            date_of_creation = EXCLUDED.date_of_creation
+            status_id = EXCLUDED.status_id,
+            location_id = EXCLUDED.location_id,
+            date_of_creation = EXCLUDED.date_of_creation,
+            company_authority = EXCLUDED.company_authority,
+            termination_date = EXCLUDED.termination_date,
+            country_id = EXCLUDED.country_id,
+            inserted_at = EXCLUDED.inserted_at,
+            updated_at = now()
         RETURNING *;
     </select>
 
@@ -33,45 +48,128 @@
         INSERT INTO industry (
         industry_code,
         industry_name,
-        industry_description
+        industry_description,
+        inserted_at,
+        updated_at
         )
         VALUES
         <foreach collection="list" item="industry" separator=",">
             (
             #{industry.industryCode},
             #{industry.industryName},
-            #{industry.industryDescription}
+            #{industry.industryDescription},
+             now(),
+             now()
             )
         </foreach>
         ON CONFLICT (industry_code)
         DO UPDATE
         SET
             industry_name = EXCLUDED.industry_name,
-            industry_description = EXCLUDED.industry_description
+            industry_description = EXCLUDED.industry_description,
+            inserted_at = EXCLUDED.inserted_at,
+            updated_at = now()
         RETURNING *;
     </select>
 
     <insert id="insertCompanyIndustry">
-        INSERT INTO company_industry(company_id, industry_id)
+        INSERT INTO company_industry(company_id, industry_id, inserted_at, updated_at)
         VALUES
         <foreach collection="industries" item="industry" separator=",">
             (
             #{company.id},
-            #{industry.id}
+            #{industry.id},
+             now(),
+             now()
             )
         </foreach>
         ON CONFLICT
         DO NOTHING;
     </insert>
 
+    <select id="insertTaxAuthority" resultMap="taxAuthorityResultMap">
+        INSERT INTO tax_authority (
+            authority_code,
+            authority_name,
+            inserted_at,
+            updated_at
+        ) VALUES
+        (
+            #{authorityCode},
+            #{authorityName},
+         now(),
+         now()
+        ) ON CONFLICT (authority_code, authority_name)
+            DO UPDATE
+          SET
+              authority_code = EXCLUDED.authority_code,
+              authority_name = EXCLUDED.authority_name,
+              inserted_at = EXCLUDED.inserted_at,
+              updated_at = now()
+          RETURNING *;
+    </select>
+
+    <insert id="insertTaxCompany">
+        INSERT INTO tax_company (tax_registration_number, date_of_registration, tax_payer_type, tax_authority_id, company_id
+        ,inserted_at, updated_at)
+        VALUES (#{taxRegistrationNumber},
+                #{dateOfRegistration},
+                #{taxPayerType},
+                #{taxAuthorityId},
+                #{companyId},
+                now(),
+                now()
+               )
+        ON CONFLICT DO NOTHING
+    </insert>
+    
+    <select id="insertCountry" resultMap="countryResultMap">
+        INSERT INTO country (country_name, inserted_at, updated_at)
+        VALUES (#{countryName}, now(), now())
+        ON CONFLICT (country_name) DO UPDATE
+        SET
+            country_name = EXCLUDED.country_name
+        RETURNING *;
+    </select>
+    
+    <select id="insertCompanyLocation" resultMap="companyLocationResultMap">
+        INSERT INTO company_location (location, inserted_at, updated_at)
+        VALUES (#{location}, now(), now())
+        ON CONFLICT (location) DO UPDATE
+        SET
+            location = EXCLUDED.location
+        RETURNING *;
+    </select>
+    
+    <select id="insertCompanyStatus" resultMap="companyStatusResultMap">
+        INSERT INTO company_status (status, inserted_at, updated_at)
+        VALUES (#{status}, now(), now())
+        ON CONFLICT (status) DO UPDATE
+        SET
+            status = EXCLUDED.status
+        RETURNING *;
+    </select>
+
     <resultMap id="companyResultMap" type="com.internship.exporter.model.Company">
         <id property="id" column="id"/>
         <result property="companyName" column="company_name"/>
         <result property="companyNumber" column="company_number"/>
-        <result property="companyStatus" column="company_status"/>
-        <result property="companyLocation" column="company_location"/>
         <result property="dateOfCreation" column="date_of_creation"/>
+        <result property="companyAuthority" column="company_authority"/>
+
+        <association property="companyStatus" javaType="com.internship.exporter.model.CompanyStatus">
+            <id property="id" column="status_id"/>
+        </association>
+
+        <association property="companyLocation" javaType="com.internship.exporter.model.CompanyLocation">
+            <id property="id" column="location_id"/>
+        </association>
+
+        <association property="country" javaType="com.internship.exporter.model.Country">
+            <id property="id" column="country_id"/>
+        </association>
     </resultMap>
+
 
     <resultMap id="industryResultMap" type="com.internship.exporter.model.Industry">
         <id property="id" column="id"/>
@@ -80,4 +178,24 @@
         <result property="industryDescription" column="industry_description"/>
     </resultMap>
 
+    <resultMap id="taxAuthorityResultMap" type="com.internship.exporter.model.TaxAuthority">
+        <id property="id" column="id"/>
+        <result property="authorityCode" column="authority_code"/>
+        <result property="authorityName" column="authority_name"/>
+    </resultMap>
+    
+    <resultMap id="countryResultMap" type="com.internship.exporter.model.Country">
+        <id property="id" column="id"/>
+        <result property="countryName" column="country_name"/>
+    </resultMap>
+
+    <resultMap id="companyLocationResultMap" type="com.internship.exporter.model.CompanyLocation">
+        <id property="id" column="id"/>
+        <result property="location" column="location"/>
+    </resultMap>
+
+    <resultMap id="companyStatusResultMap" type="com.internship.exporter.model.CompanyStatus">
+        <id property="id" column="id"/>
+        <result property="status" column="status"/>
+    </resultMap>
 </mapper>
