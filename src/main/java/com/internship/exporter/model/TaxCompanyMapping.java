@@ -4,7 +4,7 @@ package com.internship.exporter.model;
 import lombok.Data;
 
 @Data
-public class TaxInfoMapping {
+public class TaxCompanyMapping {
     private String taxRegistrationNumber;
     private String dateOfRegistration;
     private String taxPayerType;

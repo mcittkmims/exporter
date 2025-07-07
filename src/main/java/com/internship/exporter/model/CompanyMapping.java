@@ -14,4 +14,5 @@ public class CompanyMapping {
     private String terminationDate;
     private String taxInfo;
     private String taxAuthority;
+    private String country;
 }

@@ -15,21 +15,22 @@ import java.util.List;
 public class CompanyJsonConverter {
 
     public Company mapJsonToCompany(String json, CompanyMapping companyMapping, IndustryMapping industryMapping,
-                                    TaxAuthorityMapping taxAuthorityMapping, TaxInfoMapping taxInfoMapping) {
+                                    TaxAuthorityMapping taxAuthorityMapping, TaxCompanyMapping taxCompanyMapping) {
         Object document = Configuration.defaultConfiguration().jsonProvider().parse(json);
         Company company = new Company();
         company.setCompanyName(extractStringIfPresent(document,companyMapping.getCompanyName()));
         company.setCompanyNumber(extractStringIfPresent(document,companyMapping.getCompanyNumber()));
-        company.setCompanyLocation(extractStringIfPresent(document, companyMapping.getCompanyLocation()));
-        company.setCompanyStatus(extractStringIfPresent(document, companyMapping.getCompanyStatus()));
+        company.setCompanyLocation(extractCompanyLocationIfPresent(document, companyMapping.getCompanyLocation()));
+        company.setCompanyStatus(extractCompanyStatusIfPresent(document, companyMapping.getCompanyStatus()));
         company.setDateOfCreation(extractDateIfPresent(document, companyMapping.getDateOfCreation()));
         company.setCompanyAuthority(extractStringIfPresent(document, companyMapping.getCompanyAuthority()));
         company.setIndustries(extractIndustriesIfPresent(document, companyMapping.getIndustries(), industryMapping));
         company.setTerminationDate(extractDateIfPresent(document, companyMapping.getTerminationDate()));
         company.setTaxAuthority(extractTaxAuthorityIfPresent(document, companyMapping.getTaxInfo(), taxAuthorityMapping));
-        company.setTaxInfo(extractTaxInfoIfPresent(document, companyMapping.getTaxInfo(), taxInfoMapping));
-        return company;
+        company.setTaxCompany(extractTaxInfoIfPresent(document, companyMapping.getTaxInfo(), taxCompanyMapping));
+        company.setCountry(extractCountryIfPresent(companyMapping.getCountry()));
 
+        return company;
     }
 
     private static String extractStringIfPresent(Object json, String jsonPathExpression) {
@@ -71,7 +72,7 @@ public class CompanyJsonConverter {
 
     private static List<Industry> extractIndustriesIfPresent(Object json, String industriesPath, IndustryMapping industryMapping) {
         List<Industry> industries = new ArrayList<>();
-
+        
         if (industriesPath == null || industriesPath.isEmpty()) {
             return industries;
         }
@@ -96,7 +97,7 @@ public class CompanyJsonConverter {
             }
         } catch (Exception ignored) {
         }
-
+        
         return industries;
     }
     
@@ -129,23 +130,56 @@ public class CompanyJsonConverter {
         return taxAuthority;
     }
 
-    private static TaxInfo extractTaxInfoIfPresent(Object json, String taxInfoPath, TaxInfoMapping taxInfoMapping) {
+    private static TaxCompany extractTaxInfoIfPresent(Object json, String taxInfoPath, TaxCompanyMapping taxCompanyMapping) {
         if (taxInfoPath == null || taxInfoPath.isEmpty()) {
             return null;
         }
 
-        TaxInfo taxInfo = new TaxInfo();
+        TaxCompany taxCompany = new TaxCompany();
         try {
             Object taxInfoObj = JsonPath.read(json, taxInfoPath);
 
             if (taxInfoObj != null) {
-                taxInfo.setTaxRegistrationNumber(extractStringFromObject(taxInfoObj, taxInfoMapping.getTaxRegistrationNumber()));
-                taxInfo.setDateOfRegistration(extractDateIfPresent(taxInfoObj, taxInfoMapping.getDateOfRegistration()));
-                taxInfo.setTaxPayerType(extractStringFromObject(taxInfoObj, taxInfoMapping.getTaxPayerType()));
+                taxCompany.setTaxRegistrationNumber(extractStringFromObject(taxInfoObj, taxCompanyMapping.getTaxRegistrationNumber()));
+                taxCompany.setDateOfRegistration(extractDateIfPresent(taxInfoObj, taxCompanyMapping.getDateOfRegistration()));
+                taxCompany.setTaxPayerType(extractStringFromObject(taxInfoObj, taxCompanyMapping.getTaxPayerType()));
             }
         } catch (Exception ignored){}
 
-        return taxInfo;
+        return taxCompany;
+    }
+
+    private static CompanyLocation extractCompanyLocationIfPresent(Object json, String companyLocationPath) {
+        if (companyLocationPath == null || companyLocationPath.isEmpty()) {
+            return null;
+        }
+
+        CompanyLocation companyLocation = new CompanyLocation();
+        companyLocation.setLocation(extractStringIfPresent(json, companyLocationPath));
+
+        return companyLocation;
+    }
+
+    private static CompanyStatus extractCompanyStatusIfPresent(Object json, String companyStatusPath) {
+        if (companyStatusPath == null || companyStatusPath.isEmpty()) {
+            return null;
+        }
+
+        CompanyStatus companyStatus = new CompanyStatus();
+        companyStatus.setStatus(extractStringIfPresent(json, companyStatusPath));
+
+        return companyStatus;
+    }
+
+    private static Country extractCountryIfPresent(String countryPath) {
+        if (countryPath == null || countryPath.isEmpty()) {
+            return null;
+        }
+
+        Country country = new Country();
+        country.setCountryName(countryPath);
+
+        return country;
     }
 }
 

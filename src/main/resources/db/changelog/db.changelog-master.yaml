@@ -4,7 +4,7 @@ databaseChangeLog:
       author: exporter
       changes:
         - sqlFile:
-            path: migration/V1__migrate_table_industry.sql
+            path: migration/V6__migrate_table_country.sql
             relativeToChangelogFile: true
 
   - changeSet:
@@ -12,7 +12,7 @@ databaseChangeLog:
       author: exporter
       changes:
         - sqlFile:
-            path: migration/V2__migrate_table_company.sql
+            path: migration/V7__migrate_table_company_location.sql
             relativeToChangelogFile: true
 
   - changeSet:
@@ -20,7 +20,7 @@ databaseChangeLog:
       author: exporter
       changes:
         - sqlFile:
-            path: migration/V3__migrate_table_company_industry.sql
+            path: migration/V8__migrate_table_company_status.sql
             relativeToChangelogFile: true
 
   - changeSet:
@@ -28,7 +28,7 @@ databaseChangeLog:
       author: exporter
       changes:
         - sqlFile:
-            path: migration/V4__migrate_table_tax_authority.sql
+            path: migration/V1__migrate_table_industry.sql
             relativeToChangelogFile: true
 
   - changeSet:
@@ -36,5 +36,30 @@ databaseChangeLog:
       author: exporter
       changes:
         - sqlFile:
-            path: migration/V5__migrate_table_tax_info.sql
+            path: migration/V2__migrate_table_company.sql
             relativeToChangelogFile: true
+
+  - changeSet:
+      id: 6
+      author: exporter
+      changes:
+        - sqlFile:
+            path: migration/V3__migrate_table_company_industry.sql
+            relativeToChangelogFile: true
+
+  - changeSet:
+      id: 7
+      author: exporter
+      changes:
+        - sqlFile:
+            path: migration/V4__migrate_table_tax_authority.sql
+            relativeToChangelogFile: true
+
+  - changeSet:
+      id: 8
+      author: exporter
+      changes:
+        - sqlFile:
+            path: migration/V5__migrate_table_tax_company.sql
+            relativeToChangelogFile: true
+

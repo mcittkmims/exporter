@@ -3,14 +3,12 @@ package com.internship.exporter.controller;
 import com.internship.exporter.model.*;
 import com.internship.exporter.service.CompanyService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -18,15 +16,16 @@ public class CompanyController {
 
     private CompanyService service;
 
-
     @PostMapping("/upload")
-    public Flux<Company> transformRawCompanyData
+    public ResponseEntity<String> transformRawCompanyData
             (@RequestPart("companyMapping") CompanyMapping companyMapping,
              @RequestPart("industryMapping") IndustryMapping industryMapping,
              @RequestPart("taxAuthorityMapping") TaxAuthorityMapping taxAuthorityMapping,
-             @RequestPart("taxInfoMapping") TaxInfoMapping taxInfoMapping,
-             @RequestPart("data") Mono<FilePart> fileStream) throws IOException {
-        return this.service.processJsons(fileStream, companyMapping, industryMapping,
-                taxAuthorityMapping, taxInfoMapping);
+             @RequestPart("taxInfoMapping") TaxCompanyMapping taxCompanyMapping,
+             @RequestPart("data") MultipartFile fileStream) throws IOException {
+        this.service.processJsons(fileStream, companyMapping, industryMapping,
+                taxAuthorityMapping, taxCompanyMapping);
+        return ResponseEntity.ok("Data processed successfully");
     }
+
 }

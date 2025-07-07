@@ -17,5 +17,9 @@ public interface CompanyMapper {
 
     TaxAuthority insertTaxAuthority(TaxAuthority taxAuthority);
 
-    void insertTaxInfo(TaxInfo taxInfo);
+    void insertTaxCompany(TaxCompany taxCompany);
+
+    Country insertCountry(Country country);
+    CompanyLocation insertCompanyLocation(CompanyLocation companyLocation);
+    CompanyStatus insertCompanyStatus(CompanyStatus companyStatus);
 }
