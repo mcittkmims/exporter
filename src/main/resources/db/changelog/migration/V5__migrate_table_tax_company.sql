@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS tax_info (
+CREATE TABLE IF NOT EXISTS tax_company (
     id BIGSERIAL PRIMARY KEY,
     tax_registration_number TEXT UNIQUE NOT NULL,
     date_of_registration DATE,

@@ -23,12 +23,12 @@ public class CompanyService {
 
     public Flux<Company> processJsons(Mono<FilePart> filePartMono, CompanyMapping companyMapping,
                                       IndustryMapping industryMapping,
-                                      TaxAuthorityMapping taxAuthorityMapping, TaxInfoMapping taxInfoMapping) {
+                                      TaxAuthorityMapping taxAuthorityMapping, TaxCompanyMapping taxCompanyMapping) {
         return filePartMono.flatMapMany(filePart ->
                 splitLines(filePart.content())
                         .filter(line -> !line.isEmpty())
                         .map(line -> processJson(line, companyMapping, industryMapping,
-                                taxAuthorityMapping, taxInfoMapping))
+                                taxAuthorityMapping, taxCompanyMapping))
         );
     }
 
@@ -79,8 +79,8 @@ public class CompanyService {
     }
 
     private Company processJson(String s, CompanyMapping companyMapping, IndustryMapping industryMapping,
-                                TaxAuthorityMapping taxAuthorityMapping, TaxInfoMapping taxInfoMapping) {
-        Company company = converter.mapJsonToCompany(s, companyMapping, industryMapping, taxAuthorityMapping, taxInfoMapping);
+                                TaxAuthorityMapping taxAuthorityMapping, TaxCompanyMapping taxCompanyMapping) {
+        Company company = converter.mapJsonToCompany(s, companyMapping, industryMapping, taxAuthorityMapping, taxCompanyMapping);
         if (company.getCompanyNumber() != null) {
             dataService.insertCompanyData(company);
         }

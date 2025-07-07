@@ -24,9 +24,9 @@ public class CompanyController {
             (@RequestPart("companyMapping") CompanyMapping companyMapping,
              @RequestPart("industryMapping") IndustryMapping industryMapping,
              @RequestPart("taxAuthorityMapping") TaxAuthorityMapping taxAuthorityMapping,
-             @RequestPart("taxInfoMapping") TaxInfoMapping taxInfoMapping,
+             @RequestPart("taxInfoMapping") TaxCompanyMapping taxCompanyMapping,
              @RequestPart("data") Mono<FilePart> fileStream) throws IOException {
         return this.service.processJsons(fileStream, companyMapping, industryMapping,
-                taxAuthorityMapping, taxInfoMapping);
+                taxAuthorityMapping, taxCompanyMapping);
     }
 }

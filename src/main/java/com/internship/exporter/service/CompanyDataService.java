@@ -18,6 +18,25 @@ public class CompanyDataService {
     @Transactional
     protected void insertCompanyData(Company company) {
         List<Industry> industries = company.getIndustries();
+        CompanyLocation companyLocation = company.getCompanyLocation();
+        CompanyStatus companyStatus = company.getCompanyStatus();
+        Country country = company.getCountry();
+        if (companyLocation != null) {
+           companyLocation = mapper.insertCompanyLocation(companyLocation);
+        }
+
+        if (companyStatus != null) {
+            companyStatus = mapper.insertCompanyStatus(companyStatus);
+        }
+
+        if (country != null) {
+            country = mapper.insertCountry(country);
+        }
+
+        company.setCompanyLocation(companyLocation);
+        company.setCompanyStatus(companyStatus);
+        company.setCountry(country);
+
         Company newCompany = mapper.insertCompany(company);
 
         List<Industry> filteredIndustries = industries.stream()
@@ -32,11 +51,11 @@ public class CompanyDataService {
         TaxAuthority taxAuthority = company.getTaxAuthority();
         if (taxAuthority.getAuthorityName() != null) {
             taxAuthority = mapper.insertTaxAuthority(taxAuthority);
-            TaxInfo taxInfo = company.getTaxInfo();
-            if (taxInfo.getTaxRegistrationNumber() != null) {
-                taxInfo.setTaxAuthorityId(taxAuthority.getId());
-                taxInfo.setCompanyId(newCompany.getId());
-                mapper.insertTaxInfo(taxInfo);
+            TaxCompany taxCompany = company.getTaxCompany();
+            if (taxCompany.getTaxRegistrationNumber() != null) {
+                taxCompany.setTaxAuthorityId(taxAuthority.getId());
+                taxCompany.setCompanyId(newCompany.getId());
+                mapper.insertTaxCompany(taxCompany);
             }
         }
     }
