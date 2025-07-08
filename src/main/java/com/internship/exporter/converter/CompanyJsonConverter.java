@@ -1,6 +1,5 @@
 package com.internship.exporter.converter;
 
-
 import com.internship.exporter.model.*;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
@@ -15,18 +14,19 @@ import java.util.List;
 public class CompanyJsonConverter {
 
     public Company mapJsonToCompany(String json, CompanyMapping companyMapping, IndustryMapping industryMapping,
-                                    TaxAuthorityMapping taxAuthorityMapping, TaxCompanyMapping taxCompanyMapping) {
+            TaxAuthorityMapping taxAuthorityMapping, TaxCompanyMapping taxCompanyMapping) {
         Object document = Configuration.defaultConfiguration().jsonProvider().parse(json);
         Company company = new Company();
-        company.setCompanyName(extractStringIfPresent(document,companyMapping.getCompanyName()));
-        company.setCompanyNumber(extractStringIfPresent(document,companyMapping.getCompanyNumber()));
+        company.setCompanyName(extractStringIfPresent(document, companyMapping.getCompanyName()));
+        company.setCompanyNumber(extractStringIfPresent(document, companyMapping.getCompanyNumber()));
         company.setCompanyLocation(extractCompanyLocationIfPresent(document, companyMapping.getCompanyLocation()));
         company.setCompanyStatus(extractCompanyStatusIfPresent(document, companyMapping.getCompanyStatus()));
         company.setDateOfCreation(extractDateIfPresent(document, companyMapping.getDateOfCreation()));
         company.setCompanyAuthority(extractStringIfPresent(document, companyMapping.getCompanyAuthority()));
         company.setIndustries(extractIndustriesIfPresent(document, companyMapping.getIndustries(), industryMapping));
         company.setTerminationDate(extractDateIfPresent(document, companyMapping.getTerminationDate()));
-        company.setTaxAuthority(extractTaxAuthorityIfPresent(document, companyMapping.getTaxInfo(), taxAuthorityMapping));
+        company.setTaxAuthority(
+                extractTaxAuthorityIfPresent(document, companyMapping.getTaxInfo(), taxAuthorityMapping));
         company.setTaxCompany(extractTaxInfoIfPresent(document, companyMapping.getTaxInfo(), taxCompanyMapping));
         company.setCountry(extractCountryIfPresent(companyMapping.getCountry()));
 
@@ -69,10 +69,10 @@ public class CompanyJsonConverter {
         return null;
     }
 
-
-    private static List<Industry> extractIndustriesIfPresent(Object json, String industriesPath, IndustryMapping industryMapping) {
+    private static List<Industry> extractIndustriesIfPresent(Object json, String industriesPath,
+            IndustryMapping industryMapping) {
         List<Industry> industries = new ArrayList<>();
-        
+
         if (industriesPath == null || industriesPath.isEmpty()) {
             return industries;
         }
@@ -85,22 +85,24 @@ public class CompanyJsonConverter {
                     Industry industry = new Industry();
                     industry.setIndustryCode(extractStringFromObject(industryObj, industryMapping.getIndustryCode()));
                     industry.setIndustryName(extractStringFromObject(industryObj, industryMapping.getIndustryName()));
-                    industry.setIndustryDescription(extractStringFromObject(industryObj, industryMapping.getIndustryDescription()));
+                    industry.setIndustryDescription(
+                            extractStringFromObject(industryObj, industryMapping.getIndustryDescription()));
                     industries.add(industry);
                 }
             } else if (industriesObj != null) {
                 Industry industry = new Industry();
                 industry.setIndustryCode(extractStringFromObject(industriesObj, industryMapping.getIndustryCode()));
                 industry.setIndustryName(extractStringFromObject(industriesObj, industryMapping.getIndustryName()));
-                industry.setIndustryDescription(extractStringFromObject(industriesObj, industryMapping.getIndustryDescription()));
+                industry.setIndustryDescription(
+                        extractStringFromObject(industriesObj, industryMapping.getIndustryDescription()));
                 industries.add(industry);
             }
         } catch (Exception ignored) {
         }
-        
+
         return industries;
     }
-    
+
     private static String extractStringFromObject(Object obj, String fieldPath) {
         if (fieldPath == null || fieldPath.isEmpty()) {
             return null;
@@ -112,7 +114,8 @@ public class CompanyJsonConverter {
         }
     }
 
-    private static TaxAuthority extractTaxAuthorityIfPresent(Object json, String taxAuthorityPath, TaxAuthorityMapping taxAuthorityMapping) {
+    private static TaxAuthority extractTaxAuthorityIfPresent(Object json, String taxAuthorityPath,
+            TaxAuthorityMapping taxAuthorityMapping) {
         if (taxAuthorityPath == null || taxAuthorityPath.isEmpty()) {
             return null;
         }
@@ -121,16 +124,19 @@ public class CompanyJsonConverter {
         try {
             Object taxAuthorityObj = JsonPath.read(json, taxAuthorityPath);
             if (taxAuthorityObj != null) {
-                taxAuthority.setAuthorityCode(extractStringFromObject(taxAuthorityObj, taxAuthorityMapping.getAuthorityCode()));
-                taxAuthority.setAuthorityName(extractStringFromObject(taxAuthorityObj, taxAuthorityMapping.getAuthorityName()));
+                taxAuthority.setAuthorityCode(
+                        extractStringFromObject(taxAuthorityObj, taxAuthorityMapping.getAuthorityCode()));
+                taxAuthority.setAuthorityName(
+                        extractStringFromObject(taxAuthorityObj, taxAuthorityMapping.getAuthorityName()));
             }
-        } catch (Exception ignored){
+        } catch (Exception ignored) {
         }
 
         return taxAuthority;
     }
 
-    private static TaxCompany extractTaxInfoIfPresent(Object json, String taxInfoPath, TaxCompanyMapping taxCompanyMapping) {
+    private static TaxCompany extractTaxInfoIfPresent(Object json, String taxInfoPath,
+            TaxCompanyMapping taxCompanyMapping) {
         if (taxInfoPath == null || taxInfoPath.isEmpty()) {
             return null;
         }
@@ -140,11 +146,14 @@ public class CompanyJsonConverter {
             Object taxInfoObj = JsonPath.read(json, taxInfoPath);
 
             if (taxInfoObj != null) {
-                taxCompany.setTaxRegistrationNumber(extractStringFromObject(taxInfoObj, taxCompanyMapping.getTaxRegistrationNumber()));
-                taxCompany.setDateOfRegistration(extractDateIfPresent(taxInfoObj, taxCompanyMapping.getDateOfRegistration()));
+                taxCompany.setTaxRegistrationNumber(
+                        extractStringFromObject(taxInfoObj, taxCompanyMapping.getTaxRegistrationNumber()));
+                taxCompany.setDateOfRegistration(
+                        extractDateIfPresent(taxInfoObj, taxCompanyMapping.getDateOfRegistration()));
                 taxCompany.setTaxPayerType(extractStringFromObject(taxInfoObj, taxCompanyMapping.getTaxPayerType()));
             }
-        } catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
 
         return taxCompany;
     }
@@ -182,8 +191,3 @@ public class CompanyJsonConverter {
         return country;
     }
 }
-
-
-
-
-
