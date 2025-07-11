@@ -23,7 +23,7 @@ public class CompanyDataService {
         CompanyLocation companyLocation = company.getCompanyLocation();
         CompanyStatus companyStatus = company.getCompanyStatus();
         Country country = company.getCountry();
-        if (companyLocation != null) {
+        if (companyLocation != null && companyLocation.getLocation() != null) {
             String key = "location:" + companyLocation.getLocation().toLowerCase();
             CompanyLocation cached = (CompanyLocation) redisTemplate.opsForValue().get(key);
 
@@ -35,7 +35,7 @@ public class CompanyDataService {
             }
         }
 
-        if (companyStatus != null) {
+        if (companyStatus != null && companyStatus.getStatus() != null) {
             String key = "status:" + companyStatus.getStatus().toLowerCase();
             CompanyStatus cached = (CompanyStatus) redisTemplate.opsForValue().get(key);
 

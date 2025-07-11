@@ -5,7 +5,6 @@ import com.internship.exporter.model.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +17,7 @@ public class CompanyService {
 
     public List<Company> processJsons(List<String> data, CompanyMapping companyMapping,
             IndustryMapping industryMapping,
-            TaxAuthorityMapping taxAuthorityMapping, TaxCompanyMapping taxCompanyMapping) throws IOException {
+            TaxAuthorityMapping taxAuthorityMapping, TaxCompanyMapping taxCompanyMapping) {
         List<Company> companies = new ArrayList<>();
 
         for (String line : data) {
@@ -29,10 +28,7 @@ public class CompanyService {
                     if (company != null) {
                         companies.add(company);
                     }
-                } catch (Exception e) {
-                    // Log the error and continue processing other lines
-                    System.err.println("Error processing JSON line: " + line);
-                    e.printStackTrace();
+                } catch (Exception ignored) {
                 }
             }
         }
