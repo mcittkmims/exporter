@@ -16,14 +16,14 @@ public class CompanyService {
     private CompanyDataService dataService;
 
     public List<Company> processJsons(List<String> data, CompanyMapping companyMapping,
-            IndustryMapping industryMapping,
-            TaxAuthorityMapping taxAuthorityMapping, TaxCompanyMapping taxCompanyMapping) {
+                                      IndustryMapping industryMapping,
+                                      TaxAuthorityMapping taxAuthorityMapping, TaxCompanyMapping taxCompanyMapping) {
         List<Company> companies = new ArrayList<>();
 
         for (String line : data) {
             if (line != null && !line.trim().isEmpty()) {
                 try {
-                    Company company = processJson(line.trim(), companyMapping, industryMapping,
+                    Company company = converter.mapJsonToCompany(line.trim(), companyMapping, industryMapping,
                             taxAuthorityMapping, taxCompanyMapping);
                     if (company != null) {
                         companies.add(company);
@@ -33,16 +33,7 @@ public class CompanyService {
             }
         }
 
+        dataService.insertCompanyDataBatch(companies);
         return companies;
-    }
-
-    private Company processJson(String jsonLine, CompanyMapping companyMapping, IndustryMapping industryMapping,
-            TaxAuthorityMapping taxAuthorityMapping, TaxCompanyMapping taxCompanyMapping) {
-        Company company = converter.mapJsonToCompany(jsonLine, companyMapping, industryMapping, taxAuthorityMapping,
-                taxCompanyMapping);
-        if (company != null && company.getCompanyNumber() != null) {
-            dataService.insertCompanyData(company);
-        }
-        return company;
     }
 }

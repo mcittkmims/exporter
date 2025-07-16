@@ -22,4 +22,10 @@ public interface CompanyMapper {
     Country insertCountry(Country country);
     CompanyLocation insertCompanyLocation(CompanyLocation companyLocation);
     CompanyStatus insertCompanyStatus(CompanyStatus companyStatus);
+
+    Country getCountryByName(@Param("countryName") String countryName);
+    CompanyStatus getCompanyStatusByStatus(@Param("status") String statusName);
+    CompanyLocation getCompanyLocationByLocation(@Param("location") String locationName);
+    TaxAuthority getTaxAuthorityByCode(@Param("authority_code") String authorityCode);
+    List<Industry> getIndustriesByCodes(@Param("codes") List<String> codes);
 }
