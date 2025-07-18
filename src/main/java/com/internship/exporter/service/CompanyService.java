@@ -20,18 +20,16 @@ public class CompanyService {
             TaxAuthorityMapping taxAuthorityMapping, TaxCompanyMapping taxCompanyMapping) {
         List<Company> companies = new ArrayList<>();
 
-        for (String line : data) {
-            if (line != null && !line.trim().isEmpty()) {
-                try {
-                    Company company = processJson(line.trim(), companyMapping, industryMapping,
-                            taxAuthorityMapping, taxCompanyMapping);
-                    if (company != null) {
-                        companies.add(company);
-                    }
-                } catch (Exception ignored) {
-                }
-            }
-        }
+        data.parallelStream()
+                .filter(line -> line != null && !line.trim().isEmpty())
+                .forEach(line -> {
+                    try {
+                        Company company = processJson(line.trim(), companyMapping, industryMapping,
+                                taxAuthorityMapping, taxCompanyMapping);
+                        if (company != null) {
+                        }
+                    } catch (Exception ignored) {}
+                });
 
         return companies;
     }
