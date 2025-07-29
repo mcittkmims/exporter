@@ -44,7 +44,7 @@
         RETURNING *;
     </select>
 
-    <select id="insertIndustries" resultMap="industryResultMap">
+    <insert id="insertIndustries">
         INSERT INTO industry (
         industry_code,
         industry_name,
@@ -62,14 +62,15 @@
              now()
             )
         </foreach>
-        ON CONFLICT (industry_code)
-        DO UPDATE
-        SET
-            industry_name = EXCLUDED.industry_name,
-            industry_description = EXCLUDED.industry_description,
-            inserted_at = EXCLUDED.inserted_at,
-            updated_at = now()
-        RETURNING *;
+        ON CONFLICT (industry_code) DO NOTHING
+    </insert>
+
+    <select id="selectIndustriesByCodes" resultMap="industryResultMap">
+    SELECT * FROM industry
+    WHERE industry_code IN
+    <foreach collection="codes" item="code" open="(" close=")" separator=",">
+        #{code}
+    </foreach>
     </select>
 
     <insert id="insertCompanyIndustry">
@@ -87,7 +88,7 @@
         DO NOTHING;
     </insert>
 
-    <select id="insertTaxAuthority" resultMap="taxAuthorityResultMap">
+    <select id="insertTaxAuthority" parameterType="com.internship.exporter.model.TaxAuthority" resultType="Long">
         INSERT INTO tax_authority (
             authority_code,
             authority_name,
@@ -106,7 +107,7 @@
               authority_name = EXCLUDED.authority_name,
               inserted_at = EXCLUDED.inserted_at,
               updated_at = now()
-          RETURNING *;
+          RETURNING id;
     </select>
 
     <insert id="insertTaxCompany">
@@ -122,33 +123,88 @@
                )
         ON CONFLICT DO NOTHING
     </insert>
-    
-    <select id="insertCountry" resultMap="countryResultMap">
+
+    <select id="insertCountry" parameterType="com.internship.exporter.model.Country" resultType="Long">
         INSERT INTO country (country_name, inserted_at, updated_at)
         VALUES (#{countryName}, now(), now())
         ON CONFLICT (country_name) DO UPDATE
-        SET
-            country_name = EXCLUDED.country_name
-        RETURNING *;
+            SET country_name = EXCLUDED.country_name
+        RETURNING id
     </select>
     
-    <select id="insertCompanyLocation" resultMap="companyLocationResultMap">
+    <select id="insertCompanyLocation" parameterType="com.internship.exporter.model.CompanyLocation" resultType="Long">
         INSERT INTO company_location (location, inserted_at, updated_at)
         VALUES (#{location}, now(), now())
         ON CONFLICT (location) DO UPDATE
         SET
             location = EXCLUDED.location
-        RETURNING *;
+        RETURNING id;
     </select>
     
-    <select id="insertCompanyStatus" resultMap="companyStatusResultMap">
+    <select id="insertCompanyStatus" parameterType="com.internship.exporter.model.CompanyStatus" resultType="Long">
         INSERT INTO company_status (status, inserted_at, updated_at)
         VALUES (#{status}, now(), now())
         ON CONFLICT (status) DO UPDATE
         SET
             status = EXCLUDED.status
+        RETURNING id;
+    </select>
+
+    <select id="insertCompanies" parameterType="java.util.List" resultMap="companyResultMap">
+        INSERT INTO company (
+        company_name,
+        company_number,
+        status_id,
+        location_id,
+        date_of_creation,
+        company_authority,
+        termination_date,
+        country_id,
+        inserted_at,
+        updated_at
+        )
+        VALUES
+        <foreach collection="list" item="company" separator=",">
+            (
+            #{company.companyName},
+            #{company.companyNumber},
+            #{company.companyStatus.id},
+            #{company.companyLocation.id},
+            #{company.dateOfCreation},
+            #{company.companyAuthority},
+            #{company.terminationDate},
+            #{company.country.id},
+            now(),
+            now()
+            )
+        </foreach>
+        ON CONFLICT (company_number)
+        DO UPDATE SET
+        company_name = EXCLUDED.company_name,
+        status_id = EXCLUDED.status_id,
+        location_id = EXCLUDED.location_id,
+        date_of_creation = EXCLUDED.date_of_creation,
+        company_authority = EXCLUDED.company_authority,
+        termination_date = EXCLUDED.termination_date,
+        country_id = EXCLUDED.country_id,
+        inserted_at = EXCLUDED.inserted_at,
+        updated_at = now()
         RETURNING *;
     </select>
+
+    <select id="selectCompaniesByNumbers" resultMap="companyResultMap">
+        SELECT * FROM company
+        WHERE company_number IN
+        <foreach collection="numbers" item="num" open="(" close=")" separator=",">
+            #{num}
+        </foreach>
+    </select>
+
+    <select id="selectTaxAuthorityByName" resultMap="taxAuthorityResultMap">
+        SELECT * FROM tax_authority
+        WHERE authority_name = #{authorityName}
+    </select>
+
 
     <resultMap id="companyResultMap" type="com.internship.exporter.model.Company">
         <id property="id" column="id"/>

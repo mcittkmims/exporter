@@ -8,18 +8,19 @@ import java.util.List;
 
 @Mapper
 public interface CompanyMapper {
-
-    Company insertCompany(Company company);
-
-    List<Industry> insertIndustries(@Param("list") List<Industry> industries);
+    void insertIndustries(@Param("list") List<Industry> industries);
 
     void insertCompanyIndustry(@Param("company") Company company, @Param("industries")List<Industry> industries);
 
-    TaxAuthority insertTaxAuthority(TaxAuthority taxAuthority);
+    Long insertTaxCompany(TaxCompany taxCompany);
 
-    void insertTaxCompany(TaxCompany taxCompany);
+    Long insertTaxAuthority(TaxAuthority taxAuthority);
+    Long insertCountry(Country country);
+    Long insertCompanyLocation(CompanyLocation companyLocation);
+    Long insertCompanyStatus(CompanyStatus companyStatus);
 
-    Country insertCountry(Country country);
-    CompanyLocation insertCompanyLocation(CompanyLocation companyLocation);
-    CompanyStatus insertCompanyStatus(CompanyStatus companyStatus);
+    List<Company> insertCompanies(@Param("list") List<Company> companies);
+
+
+    List<Industry> selectIndustriesByCodes(List<String> codes);
 }

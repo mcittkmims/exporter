@@ -15,32 +15,36 @@ public class CompanyService {
     private CompanyJsonConverter converter;
     private CompanyDataService dataService;
 
-    public List<Company> processJsons(List<String> data, CompanyMapping companyMapping,
-            IndustryMapping industryMapping,
-            TaxAuthorityMapping taxAuthorityMapping, TaxCompanyMapping taxCompanyMapping) {
+    public List<Company> processJsons(List<String> data,
+                                      CompanyMapping companyMapping,
+                                      IndustryMapping industryMapping,
+                                      TaxAuthorityMapping taxAuthorityMapping,
+                                      TaxCompanyMapping taxCompanyMapping) {
+
         List<Company> companies = new ArrayList<>();
 
         data.parallelStream()
                 .filter(line -> line != null && !line.trim().isEmpty())
                 .forEach(line -> {
                     try {
-                        Company company = processJson(line.trim(), companyMapping, industryMapping,
-                                taxAuthorityMapping, taxCompanyMapping);
-                        if (company != null) {
+                        Company company = converter.mapJsonToCompany(line.trim(),
+                                companyMapping,
+                                industryMapping,
+                                taxAuthorityMapping,
+                                taxCompanyMapping);
+                        if (company != null && company.getCompanyNumber() != null) {
+                            synchronized (companies) {
+                                companies.add(company);
+                            }
                         }
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
                 });
 
-        return companies;
-    }
-
-    private Company processJson(String jsonLine, CompanyMapping companyMapping, IndustryMapping industryMapping,
-            TaxAuthorityMapping taxAuthorityMapping, TaxCompanyMapping taxCompanyMapping) {
-        Company company = converter.mapJsonToCompany(jsonLine, companyMapping, industryMapping, taxAuthorityMapping,
-                taxCompanyMapping);
-        if (company != null && company.getCompanyNumber() != null) {
-            dataService.insertCompanyData(company);
+        if (!companies.isEmpty()) {
+            dataService.insertCompanyDataBatch(companies); // 🚀 batch insert
         }
-        return company;
+
+        return companies;
     }
 }
